@@ -6,6 +6,10 @@ It scans your music folders and gives you a deep technical analysis of every fil
 
 ---
 
+![Auris Screenshot](screenshot.png)
+
+---
+
 ## Features
 
 - **Clipping risk detection** — identifies tracks with dangerously loud peaks
