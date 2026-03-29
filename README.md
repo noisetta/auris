@@ -62,7 +62,7 @@ Results are displayed in an interactive table with color-coded risk levels and e
 
 ## Installation
 ```bash
-git clone https://github.com/YOUR_ORG/auris.git
+git clone https://github.com/noisetta/auris.git
 cd auris
 python3 -m venv venv
 source venv/bin/activate
