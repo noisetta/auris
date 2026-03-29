@@ -109,13 +109,13 @@ def analyze_file(file_path: str) -> dict:
 
         if high_gap > 40:
             cutoff = 21000
-            quality = "excellent"
+            quality = "unverified"
         elif mid_gap > 40:
             cutoff = 18000
-            quality = "likely_lossy"
+            quality = "possible_lossy"
         else:
             cutoff = 15000
-            quality = "low_quality_lossy"
+            quality = "inconclusive"
 
         return {
             "max_volume": max_vol,
