@@ -66,7 +66,7 @@ git clone https://github.com/noisetta/auris.git
 cd auris
 python3 -m venv venv
 source venv/bin/activate
-pip install PySide6
+pip install -r requirements.txt
 python app.py
 ```
 
