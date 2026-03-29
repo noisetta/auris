@@ -90,7 +90,6 @@ Contributions are welcome. Feel free to open issues or pull requests on GitHub.
 If Auris is useful to you, consider supporting development:
 
 ☕ [Ko-fi](https://ko-fi.com/noisetta) — one-time tip
-❤️ [GitHub Sponsors](https://github.com/sponsors) — ongoing support
 
 ---
 
@@ -100,4 +99,3 @@ MIT License — free to use, modify, and distribute.
 
 ---
 
-*Built with ❤️ for music lovers everywhere.*
