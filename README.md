@@ -54,13 +54,30 @@ Results are displayed in an interactive table with color-coded risk levels and e
 ## Requirements
 
 - Linux
-- Python 3.12+
-- FFmpeg installed on your system
-- PySide6
+- FFmpeg
+- libfuse2 (only needed for AppImage)
+- Python 3.12+ (only needed if running from source)
 
 ---
 
-## Installation
+## Installation (AppImage — recommended)
+
+1. Download `Auris-x86_64.AppImage` from the [latest release](https://github.com/noisetta/auris/releases)
+2. Make it executable and run:
+
+```bash
+chmod +x Auris-x86_64.AppImage
+./Auris-x86_64.AppImage
+```
+
+Install dependencies if needed (Ubuntu/Debian/Pop!_OS):
+
+```bash
+sudo apt install ffmpeg libfuse2
+```
+
+## Installation (from source)
+
 ```bash
 git clone https://github.com/noisetta/auris.git
 cd auris
