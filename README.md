@@ -89,7 +89,7 @@ Contributions are welcome. Feel free to open issues or pull requests on GitHub.
 
 If Auris is useful to you, consider supporting development:
 
-☕ [Ko-fi](https://ko-fi.com) — one-time tip
+☕ [Ko-fi](https://ko-fi.com/noisetta) — one-time tip
 ❤️ [GitHub Sponsors](https://github.com/sponsors) — ongoing support
 
 ---
