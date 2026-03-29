@@ -31,3 +31,4 @@ Thumbs.db
 # AppImage build artifacts
 AppDir/
 *.AppImage
+.vscode/
