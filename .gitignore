@@ -27,3 +27,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# AppImage build artifacts
+AppDir/
+*.AppImage
