@@ -315,7 +315,8 @@ class MainWindow(QMainWindow):
 
         self.table.setSortingEnabled(False)
         self.table.setColumnCount(len(headers))
-        self.table.setHorizontalHeaderLabels(headers)
+        formatted_headers = [h.replace('_', ' ').title() for h in headers]
+        self.table.setHorizontalHeaderLabels(formatted_headers)
 
         tooltips = {
             "File": "The full path to the audio file on your system.",
@@ -346,6 +347,8 @@ class MainWindow(QMainWindow):
 
             for col_idx, value in enumerate(row):
                 clean_value = value.strip()
+                if headers[col_idx] == "quality":
+                    clean_value = clean_value.replace("_", " ").title()
                 item = QTableWidgetItem(clean_value)
 
                 if headers[col_idx] in ("max_volume", "mean_volume"):

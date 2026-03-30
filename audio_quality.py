@@ -109,7 +109,7 @@ def analyze_file(file_path: str) -> dict:
 
         if high_gap > 40:
             cutoff = 21000
-            quality = "unverified"
+            quality = "appears_lossless"
         elif mid_gap > 40:
             cutoff = 18000
             quality = "possible_lossy"
