@@ -60,6 +60,7 @@ Results are displayed in an interactive table with color-coded risk levels and e
 - Linux
 - FFmpeg
 - libfuse2 (only needed for AppImage)
+- libxcb-cursor0 (only needed for AppImage)
 - Python 3.12+ (only needed if running from source)
 
 ---
@@ -77,7 +78,7 @@ chmod +x Auris-x86_64.AppImage
 Install dependencies if needed (Ubuntu/Debian/Pop!_OS):
 
 ```bash
-sudo apt install ffmpeg libfuse2
+sudo apt install ffmpeg libfuse2 libxcb-cursor0
 ```
 
 ## Installation (from source)
