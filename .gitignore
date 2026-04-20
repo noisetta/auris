@@ -1,34 +1,8 @@
-# Virtual environment
 venv/
-.venv/
-env/
-
-# Python cache
 __pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
-
-# Distribution / packaging
-dist/
 build/
-*.egg-info/
-
-# Environment variables
-.env
-.env.local
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-
-# AppImage build artifacts
+dist/
+*.spec
+*.pyc
+.auris/
 AppDir/
-*.AppImage
-.vscode/
