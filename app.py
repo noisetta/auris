@@ -586,13 +586,12 @@ class MainWindow(QMainWindow):
     which is common in modern pop and streaming masters. Audiophiles generally prefer DR values above 12.</p>
 
     <h3>🎵 Quality & Cutoff Frequency</h3>
-    <p>This tells you whether a file is truly lossless or has been converted from a lossy source like MP3.
-    <b>Excellent (21000 Hz)</b> — Full frequency spectrum detected. Genuine lossless file (e.g. a real FLAC or WAV).
-    <b>Likely Lossy (18000 Hz)</b> — Frequency content drops off early. May have been converted from a lossy source.
-    <b>Low Quality Lossy (15000 Hz)</b> — Clear signs of lossy encoding. Likely an MP3 or AAC transcoded to FLAC.</p>
+<p>This tells you whether a file is truly lossless or has been converted from a lossy source like MP3.
+<b>Lossless (21000 Hz)</b> — Full frequency spectrum detected. File appears to be genuine lossless.
+<b>Likely Lossy (18000 Hz)</b> — Frequency content drops off early. May have been converted from a lossy source.
+<b>Lossy (15000 Hz)</b> — Clear signs of lossy encoding. Likely an MP3 or AAC source.</p>
 
-    <p>⚠️ A file can be a FLAC but still sound like an MP3 if it was converted from one.
-    This scanner helps you identify those "fake lossless" files in your library.</p>
+<p>⚠️ <b>Important disclaimer:</b> These results are based on spectral analysis and are not guaranteed to be 100% accurate in all cases. A file labelled <b>Lossless</b> has full frequency content but this does not guarantee it was never transcoded. A file labelled <b>Lossy</b> shows strong evidence of lossy encoding but rare edge cases exist. Use these results as a guide, not a definitive verdict. When in doubt, check the original source of your files.</p>
 
     <h3>📐 Sample Rate & Bit Depth</h3>
     <p><b>Sample rate</b> (Hz) — How many audio snapshots are taken per second.
