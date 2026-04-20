@@ -6,3 +6,5 @@ dist/
 *.pyc
 .auris/
 AppDir/
+.vscode/
+Auris-x86_64.AppImage
