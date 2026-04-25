@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import scanner
+from compare import CompareDialog
 
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QColor, QAction, QPalette, QIcon
@@ -86,6 +87,7 @@ class MainWindow(QMainWindow):
         self.scan_button = QPushButton("Scan")
         self.stop_button = QPushButton("Stop")
         self.stop_button.setEnabled(False)
+        self.compare_button = QPushButton("Compare Files")
         self.export_button = QPushButton("Export CSV")
         self.help_button = QPushButton("?")
         self.help_button.setFixedWidth(30)
@@ -99,16 +101,16 @@ class MainWindow(QMainWindow):
         self.status_label = QLabel("Ready.")
 
         self.filter_all = QPushButton("All")
-        self.filter_high = QPushButton("High")
-        self.filter_moderate = QPushButton("Moderate")
-        self.filter_low = QPushButton("Low")
+        self.filter_high = QPushButton("Full Spectrum")
+        self.filter_moderate = QPushButton("Reduced Spectrum")
+        self.filter_low = QPushButton("Limited Spectrum")
         self.filter_failed = QPushButton("Failed")
 
         self.filter_buttons = {
             "all": self.filter_all,
-            "high": self.filter_high,
-            "moderate": self.filter_moderate,
-            "low": self.filter_low,
+            "Full Spectrum": self.filter_high,
+            "Reduced Spectrum": self.filter_moderate,
+            "Limited Spectrum": self.filter_low,
             "scan_failed": self.filter_failed,
         }
 
@@ -119,8 +121,8 @@ class MainWindow(QMainWindow):
         self.progress_bar.setVisible(False)
 
         self.table = QTableWidget()
-        self.table.setColumnCount(9)
-        self.table.setHorizontalHeaderLabels(["File", "Max Volume", "Mean Volume", "Risk", "Cutoff Freq", "Quality", "Dynamic Range", "Sample Rate", "Bit Depth"])
+        self.table.setColumnCount(11)
+        self.table.setHorizontalHeaderLabels(["File", "Max Volume", "Mean Volume", "Risk", "Cutoff Freq", "Spectral Gap", "Quality", "Dynamic Range", "True Peak", "Sample Rate", "Bit Depth"])
         self.table.setSortingEnabled(True)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QTableWidget.SingleSelection)
@@ -132,6 +134,7 @@ class MainWindow(QMainWindow):
         top_row.addWidget(self.browse_button)
         top_row.addWidget(self.scan_button)
         top_row.addWidget(self.stop_button)
+        top_row.addWidget(self.compare_button)
 
         search_row = QHBoxLayout()
         search_row.addWidget(self.search_label)
@@ -174,11 +177,12 @@ class MainWindow(QMainWindow):
         self.stop_button.clicked.connect(self.stop_scan)
         self.export_button.clicked.connect(self.export_csv)
         self.help_button.clicked.connect(self.show_help)
+        self.compare_button.clicked.connect(self.open_compare)
 
         self.filter_all.clicked.connect(lambda: self.set_filter("all"))
-        self.filter_high.clicked.connect(lambda: self.set_filter("high"))
-        self.filter_moderate.clicked.connect(lambda: self.set_filter("moderate"))
-        self.filter_low.clicked.connect(lambda: self.set_filter("low"))
+        self.filter_high.clicked.connect(lambda: self.set_filter("Full Spectrum"))
+        self.filter_moderate.clicked.connect(lambda: self.set_filter("Reduced Spectrum"))
+        self.filter_low.clicked.connect(lambda: self.set_filter("Limited Spectrum"))
         self.filter_failed.clicked.connect(lambda: self.set_filter("scan_failed"))
 
         self.search_edit.textChanged.connect(self.apply_filters)
@@ -199,6 +203,11 @@ class MainWindow(QMainWindow):
         )
         if folder:
             self.path_edit.setText(folder)
+
+    def open_compare(self) -> None:
+        is_dark = QApplication.instance().property("is_dark") or False
+        dialog = CompareDialog(parent=self, is_dark=is_dark)
+        dialog.exec()
 
     def run_scan(self) -> None:
         folder = self.path_edit.text().strip()
@@ -322,10 +331,12 @@ class MainWindow(QMainWindow):
             "File": "The full path to the audio file on your system.",
             "Max Volume": "The loudest peak in the track (dBFS). Values close to 0.0 dB indicate potential clipping.",
             "Mean Volume": "The average loudness of the track (dBFS). Helps identify heavily compressed or quiet recordings.",
-            "Risk": "Clipping risk based on peak and average volume. High = likely clipping, Moderate = borderline, Low = safe.",
-            "Cutoff Freq": "Estimated frequency cutoff (Hz). 21000 = full lossless spectrum. 15000 = lossy source detected.",
-            "Quality": "Overall quality estimate based on frequency content. Excellent = genuine lossless, Low quality lossy = likely transcoded from MP3.",
-            "Dynamic Range": "The difference between the loudest and quietest parts (dB). Higher = more dynamic and natural sounding. Below 8 may indicate heavy compression.",
+            "Risk": "Clipping risk based on true peak and volume. High = clipping detected, Moderate = borderline, Low = safe.",
+            "Cutoff Freq": "Frequency threshold used for spectral classification (Hz).",
+            "Spectral Gap": "Energy gap (dB) between the >20kHz filtered signal and full signal. Larger = less high-frequency content present. Note: vocal and acoustic recordings naturally show large gaps regardless of quality — this is a measurement of content, not encode quality alone.",
+            "Quality": "Describes measured frequency content. Full Spectrum = high frequencies present above 20kHz. Reduced Spectrum = limited above 16kHz, or 24-bit file with naturally limited content (vocal, acoustic recordings). Limited Spectrum = content limited above 15kHz, consistent with lossy encoding. Note: vocal and acoustic recordings naturally have limited high-frequency content regardless of encode format.",
+            "Dynamic Range": "Peak minus RMS level (dB). Higher = more dynamic and natural sounding. Below 8 may indicate heavy compression.",
+            "True Peak": "Inter-sample peak level (dBFS) measured via oversampling. Values above 0 indicate inter-sample clipping.",
             "Sample Rate": "Number of audio samples per second (Hz). 44100 = CD quality. Higher rates capture more detail.",
             "Bit Depth": "Number of bits per sample. 16-bit = CD quality. 24-bit = studio quality with more dynamic headroom.",
         }
@@ -370,24 +381,28 @@ class MainWindow(QMainWindow):
     def update_filter_button_labels(self) -> None:
         counts = {
             "all": len(self.all_rows),
-            "high": 0,
-            "moderate": 0,
-            "low": 0,
+            "Full Spectrum": 0,
+            "Reduced Spectrum": 0,
+            "Limited Spectrum": 0,
             "scan_failed": 0,
         }
 
-        if self.headers and "risk" in self.headers:
-            risk_index = self.headers.index("risk")
-            for row in self.all_rows:
-                if len(row) > risk_index:
-                    risk_value = row[risk_index].strip().lower()
-                    if risk_value in counts:
-                        counts[risk_value] += 1
+        quality_index = self.headers.index("quality") if self.headers and "quality" in self.headers else -1
+        risk_index = self.headers.index("risk") if self.headers and "risk" in self.headers else -1
+
+        for row in self.all_rows:
+            if quality_index >= 0 and len(row) > quality_index:
+                quality_value = row[quality_index].strip()
+                if quality_value in counts:
+                    counts[quality_value] += 1
+            if risk_index >= 0 and len(row) > risk_index:
+                if row[risk_index].strip().lower() == "scan_failed":
+                    counts["scan_failed"] += 1
 
         self.filter_all.setText(f"All ({counts['all']})")
-        self.filter_high.setText(f"High ({counts['high']})")
-        self.filter_moderate.setText(f"Moderate ({counts['moderate']})")
-        self.filter_low.setText(f"Low ({counts['low']})")
+        self.filter_high.setText(f"Full Spectrum ({counts['Full Spectrum']})")
+        self.filter_moderate.setText(f"Reduced Spectrum ({counts['Reduced Spectrum']})")
+        self.filter_low.setText(f"Limited Spectrum ({counts['Limited Spectrum']})")
         self.filter_failed.setText(f"Failed ({counts['scan_failed']})")
 
     def update_filter_button_styles(self) -> None:
@@ -427,12 +442,20 @@ class MainWindow(QMainWindow):
 
         if self.current_filter == "all":
             filtered = self.all_rows
-        else:
-            risk_index = self.headers.index("risk")
+        elif self.current_filter == "scan_failed":
+            risk_index = self.headers.index("risk") if "risk" in self.headers else -1
             filtered = [
-                row
-                for row in self.all_rows
-                if len(row) > risk_index and row[risk_index].strip().lower() == self.current_filter
+                row for row in self.all_rows
+                if risk_index >= 0 and len(row) > risk_index
+                and row[risk_index].strip().lower() == "scan_failed"
+            ]
+        else:
+            # Filter by quality column (Full Spectrum / Reduced Spectrum / Limited Spectrum)
+            quality_index = self.headers.index("quality") if "quality" in self.headers else -1
+            filtered = [
+                row for row in self.all_rows
+                if quality_index >= 0 and len(row) > quality_index
+                and row[quality_index].strip() == self.current_filter
             ]
 
         if search_text:

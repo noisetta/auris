@@ -17,8 +17,16 @@ def find_audio_files(directory: str) -> list[str]:
     return sorted(matches)
 
 
-def calculate_risk(max_volume: float, mean_volume: float) -> str:
-    """Apply risk classification logic."""
+def calculate_risk(max_volume: float, mean_volume: float, true_peak: float = None) -> str:
+    """
+    Apply clipping risk classification.
+    Uses true peak (inter-sample) when available — more accurate than
+    max_volume alone, which misses peaks between samples.
+    """
+    # True peak > 0 dBFS means inter-sample clipping is occurring
+    if true_peak is not None and true_peak > 0:
+        return "high"
+    # Fall back to max_volume / mean_volume heuristic
     if max_volume >= -0.1 and mean_volume > -13:
         return "high"
     elif max_volume >= -0.5 and mean_volume > -15:
@@ -45,17 +53,21 @@ def scan_directory(directory: str, output_csv: str, progress_callback=None, shou
         result = analyze_file(file_path)
 
         if result["error"] or result["max_volume"] is None:
-            row = [file_path, "", "", "scan_failed", "", "scan_failed", "", result.get("sample_rate", ""), result.get("bit_depth", "")]
+            row = [file_path, "", "", "scan_failed", "", "scan_failed", "", "", result.get("sample_rate", ""), result.get("bit_depth", "")]
         else:
             max_vol = result["max_volume"]
             mean_vol = result["mean_volume"]
-            risk = calculate_risk(max_vol, mean_vol)
+            true_peak = result.get("true_peak")
+            risk = calculate_risk(max_vol, mean_vol, true_peak)
             cutoff = result["cutoff_freq"]
+            spectral_gap_raw = result.get("spectral_gap_db")
+            spectral_gap = str(spectral_gap_raw) if spectral_gap_raw is not None else ""
             quality = result["quality"]
             dynamic_range = result.get("dynamic_range", "")
             sample_rate = result.get("sample_rate", "")
             bit_depth = result.get("bit_depth", "")
-            row = [file_path, max_vol, mean_vol, risk, cutoff, quality, dynamic_range, sample_rate, bit_depth]
+            true_peak_str = f"{true_peak:.1f}" if true_peak is not None else ""
+            row = [file_path, max_vol, mean_vol, risk, cutoff, spectral_gap, quality, dynamic_range, true_peak_str, sample_rate, bit_depth]
 
         with counter_lock:
             completed[0] += 1
@@ -83,7 +95,7 @@ def scan_directory(directory: str, output_csv: str, progress_callback=None, shou
     # Write results in original file order
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["file", "max_volume", "mean_volume", "risk", "cutoff_freq", "quality", "dynamic_range", "sample_rate", "bit_depth"])
+        writer.writerow(["file", "max_volume", "mean_volume", "risk", "cutoff_freq", "spectral_gap_db", "quality", "dynamic_range", "true_peak", "sample_rate", "bit_depth"])
         for file_path in files:
             if file_path in results:
                 writer.writerow(results[file_path])
