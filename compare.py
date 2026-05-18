@@ -239,7 +239,7 @@ class CompareDialog(QDialog):
 
         sub = QLabel(
             "Select 2–5 audio files to compare their quality characteristics. "
-            "EMMS will recommend which version to keep."
+            "Auris will recommend which version to keep."
         )
         sub.setWordWrap(True)
         sub.setStyleSheet("color: #888; font-size: 12px;")
@@ -325,7 +325,7 @@ class CompareDialog(QDialog):
             self,
             "Select audio files to compare",
             os.path.expanduser("~/Music"),
-            "Audio Files (*.flac *.mp3 *.wav *.m4a *.aac *.ogg *.opus)"
+            "Audio Files (*.flac *.mp3 *.wav *.m4a *.aac *.ogg *.opus *.wma)"
         )
 
         added = 0

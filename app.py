@@ -24,6 +24,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+# Supported audio formats — also update AUDIO_EXTENSIONS in scanner.py and
+# the file filter string in compare.py if adding new formats.
+# Current formats: flac, mp3, wav, m4a, aac, ogg, opus, wma
 CSV_OUTPUT = os.path.join(os.path.expanduser("~"), ".auris", "audio_scan_results.csv")
 os.makedirs(os.path.dirname(CSV_OUTPUT), exist_ok=True)
 
@@ -68,9 +71,6 @@ class MainWindow(QMainWindow):
             icon_path = os.path.join(base_path, "_internal", "auris.png")
         else:
             icon_path = os.path.join(os.path.dirname(__file__), "auris.png")
-
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
 
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
@@ -148,16 +148,17 @@ class MainWindow(QMainWindow):
         filter_row.addWidget(self.filter_low)
         filter_row.addWidget(self.filter_failed)
 
+        self.version_label = QLabel("v1.1.1")
+        self.version_label.setStyleSheet("color: gray; font-size: 11px;")
+        self.version_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
         action_row = QHBoxLayout()
         action_row.addWidget(self.open_button)
         action_row.addWidget(self.reveal_button)
         action_row.addWidget(self.export_button)
         action_row.addStretch()
-        action_row.addWidget(self.open_button)
-        action_row.addWidget(self.reveal_button)
-        action_row.addWidget(self.export_button)
-        action_row.addStretch()
-        action_row.addWidget(self.help_button)  
+        action_row.addWidget(self.version_label)
+        action_row.addWidget(self.help_button)
 
         layout = QVBoxLayout()
         layout.addLayout(top_row)
@@ -263,8 +264,6 @@ class MainWindow(QMainWindow):
         self.browse_button.setEnabled(True)
         self.stop_button.setEnabled(False)
         self.progress_bar.setVisible(False)
-        QMessageBox.critical(self, "Scan error", message)
-        self.status_label.setText("Scan failed.")
         if "Scan stopped by user" in message:
             self.status_label.setText("Scan stopped.")
             if os.path.isfile(CSV_OUTPUT):
@@ -627,7 +626,7 @@ class MainWindow(QMainWindow):
 
     <h3>💡 What Should I Do With This?</h3>
     <ul>
-    <li>Files marked <b>Low Quality Lossy</b> in your FLAC library are likely transcoded — consider replacing them with genuine lossless versions.</li>
+    <li>Files marked <b>Limited Spectrum</b> in your FLAC library are likely transcoded — consider replacing them with genuine lossless versions.</li>
     <li>Files with <b>High</b> clipping risk may sound distorted at loud volumes.</li>
     <li>Low <b>dynamic range</b> doesn't mean a file is broken — it's a mastering choice — but it may affect your listening experience.</li>
     </ul>
@@ -718,8 +717,12 @@ def main() -> None:
             dark_palette.setColor(QPalette.Disabled, QPalette.ButtonText, QColor(120, 120, 120))
             app.setPalette(dark_palette)
 
-    # Set app icon
-    icon_path = os.path.join(os.path.dirname(__file__), "auris.png")
+    # Set app icon (frozen-aware for AppImage)
+    if getattr(sys, 'frozen', False):
+        _icon_base = os.path.dirname(sys.executable)
+        icon_path = os.path.join(_icon_base, "_internal", "auris.png")
+    else:
+        icon_path = os.path.join(os.path.dirname(__file__), "auris.png")
     if os.path.exists(icon_path):
         app.setDesktopFileName("auris")
         app.setWindowIcon(QIcon(icon_path))

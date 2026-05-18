@@ -4,7 +4,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from audio_quality import analyze_file
 
-AUDIO_EXTENSIONS = (".flac", ".mp3", ".wav", ".m4a", ".aac", ".ogg", ".opus")
+AUDIO_EXTENSIONS = (".flac", ".mp3", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".wma")
 
 
 def find_audio_files(directory: str) -> list[str]:
