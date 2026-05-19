@@ -1,3 +1,11 @@
+## Support Auris
+
+If Auris is useful to you, consider supporting development:
+
+☕ [Ko-fi](https://ko-fi.com/noisetta) — one-time tip
+
+---
+
 # Auris
 
 **Auris** is a desktop audio library scanner for Linux, built for anyone who cares about the quality of their music collection.
@@ -157,14 +165,6 @@ python app.py
 ## Contributing
 
 Contributions are welcome. Feel free to open issues or pull requests on GitHub.
-
----
-
-## Support Auris
-
-If Auris is useful to you, consider supporting development:
-
-☕ [Ko-fi](https://ko-fi.com/noisetta) — one-time tip
 
 ---
 
