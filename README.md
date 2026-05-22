@@ -1,3 +1,11 @@
+## Support Auris
+
+If Auris is useful to you, consider supporting development:
+
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/noisetta)
+
+---
+
 # Auris
 
 **Auris** is a desktop audio library scanner for Linux, built for anyone who cares about the quality of their music collection.
@@ -131,6 +139,12 @@ python app.py
 
 ## Changelog
 
+### v1.1.1
+- **WMA support** — `.wma` files now supported in both the scanner and Compare Files dialog
+- **Bug fixes** — duplicate widgets in action row, double error dialog on scan failure, help dialog referencing old quality label, app icon not loading inside AppImage
+- **Version label** — current version now visible in the UI
+- **Typo fix** — corrected "EMMS" label in Compare Files dialog
+
 ### v1.1.0
 - **Compare Files** — new feature to compare 2–5 audio files side by side with quality recommendation
 - **Spectral classification renamed** — labels now describe measured frequency content (Full Spectrum / Reduced Spectrum / Limited Spectrum) rather than making provenance claims (Lossless / Likely Lossy / Lossy)
@@ -154,17 +168,20 @@ python app.py
 
 ---
 
-## Contributing
+## Roadmap
 
-Contributions are welcome. Feel free to open issues or pull requests on GitHub.
+Active development. Planned for upcoming releases:
+
+- **Spectrogram export** — generate and export spectrograms for scanned files, useful for sharing quality proof with others
+- **Network transfer monitoring** — real-time analysis of incoming audio transfers, designed for Soulseek/Nicotine+ users
+- **Watched folder daemon** — automatic scan of new files as they arrive in a download folder
+- **AUR package** — native installation for Arch-based distributions
 
 ---
 
-## Support Auris
+## Contributing
 
-If Auris is useful to you, consider supporting development:
-
-☕ [Ko-fi](https://ko-fi.com/noisetta) — one-time tip
+Contributions are welcome. Feel free to open issues or pull requests on GitHub.
 
 ---
 

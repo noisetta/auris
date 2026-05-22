@@ -8,3 +8,4 @@ dist/
 AppDir/
 .vscode/
 Auris-x86_64.AppImage
+probe.log
