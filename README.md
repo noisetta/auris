@@ -3,6 +3,7 @@
 If Auris is useful to you, consider supporting development:
 
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/noisetta)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/noisetta?style=flat&logo=githubsponsors&color=EA4AAA)](https://github.com/sponsors/noisetta)
 
 ---
 
