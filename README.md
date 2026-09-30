@@ -148,6 +148,10 @@ python app.py
 
 ## Changelog
 
+### v1.1.3
+
+- **Fixed the AppImage failing to start on minimal systems** — the graphics and X11 libraries Qt needs to open a window are now bundled inside the AppImage
+
 ### v1.1.2
 
 - **Wider compatibility** — the AppImage is now built automatically on Ubuntu 22.04, so it runs on older distributions that previously couldn't start it (glibc errors)
