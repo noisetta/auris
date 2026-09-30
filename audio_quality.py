@@ -1,5 +1,27 @@
+import os
 import re
 import subprocess
+import sys
+
+
+def clean_env() -> dict:
+    """
+    Environment for launching system programs (ffmpeg, ffprobe, xdg-open, etc.).
+
+    When Auris runs as a PyInstaller build (e.g. the AppImage), PyInstaller sets
+    LD_LIBRARY_PATH so the app loads its own bundled libraries. Child processes
+    inherit that, which makes the system's ffmpeg load Auris's bundled (older)
+    libraries and crash. This restores the user's original library path so
+    system programs use their own libraries. Running from source is unaffected.
+    """
+    env = dict(os.environ)
+    if getattr(sys, "frozen", False):
+        orig = env.get("LD_LIBRARY_PATH_ORIG")
+        if orig is not None:
+            env["LD_LIBRARY_PATH"] = orig
+        else:
+            env.pop("LD_LIBRARY_PATH", None)
+    return env
 
 
 def analyze_file(file_path: str) -> dict:
@@ -20,6 +42,7 @@ def analyze_file(file_path: str) -> dict:
             ],
             capture_output=True,
             text=True,
+            env=clean_env(),
         )
 
         sample_rate = None
@@ -59,6 +82,7 @@ def analyze_file(file_path: str) -> dict:
             ],
             capture_output=True,
             text=True,
+            env=clean_env(),
         )
         output = result.stderr
 
@@ -76,6 +100,7 @@ def analyze_file(file_path: str) -> dict:
             ],
             capture_output=True,
             text=True,
+            env=clean_env(),
         )
         dr_output = dr_result.stderr
 
@@ -187,6 +212,7 @@ def analyze_file(file_path: str) -> dict:
                 ],
                 capture_output=True,
                 text=True,
+                env=clean_env(),
             )
             tp_match = re.search(
                 r"True peak\s*:\s*Peak:\s*([-\d.]+)\s*dBFS",

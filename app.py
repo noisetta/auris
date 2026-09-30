@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import scanner
+from audio_quality import clean_env
 from compare import CompareDialog
 
 from PySide6.QtCore import Qt, QThread, Signal
@@ -148,7 +149,7 @@ class MainWindow(QMainWindow):
         filter_row.addWidget(self.filter_low)
         filter_row.addWidget(self.filter_failed)
 
-        self.version_label = QLabel("v1.1.1")
+        self.version_label = QLabel("v1.1.2")
         self.version_label.setStyleSheet("color: gray; font-size: 11px;")
         self.version_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
@@ -526,7 +527,7 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            subprocess.Popen(["xdg-open", file_path])
+            subprocess.Popen(["xdg-open", file_path], env=clean_env())
         except Exception as e:
             QMessageBox.critical(
                 self,
@@ -550,7 +551,7 @@ class MainWindow(QMainWindow):
         folder_path = os.path.dirname(file_path)
 
         try:
-            subprocess.Popen(["xdg-open", folder_path])
+            subprocess.Popen(["xdg-open", folder_path], env=clean_env())
         except Exception as e:
             QMessageBox.critical(
                 self,
@@ -675,7 +676,7 @@ def main() -> None:
             import subprocess
             result = subprocess.run(
                 ["dconf", "read", "/org/gnome/desktop/interface/color-scheme"],
-                capture_output=True, text=True
+                capture_output=True, text=True, env=clean_env()
             )
             is_dark = "dark" in result.stdout.lower()
         except Exception:
@@ -686,7 +687,7 @@ def main() -> None:
             try:
                 result = subprocess.run(
                     ["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"],
-                    capture_output=True, text=True
+                    capture_output=True, text=True, env=clean_env()
                 )
                 is_dark = "dark" in result.stdout.lower()
             except Exception:
