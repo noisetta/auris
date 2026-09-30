@@ -95,3 +95,40 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: Auris-x86_64.AppImage
+
+  # Diagnostic: launch the AppImage on a clean Ubuntu 22.04 machine (like the
+  # AppImage catalog's test bot does) and print everything it says.
+  # This job never blocks the release; it's only here to show what goes wrong.
+  test:
+    needs: build
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: Auris-x86_64.AppImage
+
+      - name: Install a virtual screen and firejail (nothing else)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb firejail
+
+      - name: Check for missing libraries in the Qt window plugin
+        run: |
+          chmod +x Auris-x86_64.AppImage
+          ./Auris-x86_64.AppImage --appimage-extract > /dev/null
+          PLUGIN=$(find squashfs-root -name 'libqxcb.so' | head -n 1)
+          echo "Plugin: $PLUGIN"
+          ldd "$PLUGIN" | grep "not found" || echo "No missing libraries for the xcb plugin"
+          echo "--- Missing libraries anywhere in the bundle ---"
+          find squashfs-root -name '*.so*' -type f -exec ldd {} \; 2>/dev/null | grep "not found" | sort -u || echo "None"
+
+      - name: Launch normally (15 seconds)
+        run: |
+          QT_DEBUG_PLUGINS=1 timeout 15 xvfb-run -a ./Auris-x86_64.AppImage 2>&1 | tail -n 80
+          echo "Exit code: ${PIPESTATUS[0]} (124 means it was still running after 15 s, which is good)"
+
+      - name: Launch inside firejail, like the catalog bot (15 seconds)
+        run: |
+          QT_DEBUG_PLUGINS=1 timeout 15 xvfb-run -a firejail --noprofile --appimage ./Auris-x86_64.AppImage 2>&1 | tail -n 80
+          echo "Exit code: ${PIPESTATUS[0]} (124 means it was still running after 15 s, which is good)"
