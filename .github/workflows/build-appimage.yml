@@ -26,7 +26,10 @@ jobs:
       - name: Install system packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxcb-cursor0 file
+          sudo apt-get install -y file \
+            libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-util1 \
+            libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-shape0 \
+            libxcb-xkb1 libegl1
 
       - name: Install Python dependencies
         run: |
@@ -44,12 +47,24 @@ jobs:
           find dist/Auris/_internal -name 'libfontconfig.so*' -delete
           find dist/Auris/_internal -name 'libfreetype.so*' -delete
 
-      - name: Bundle libxcb-cursor (so users don't need to install it)
+      - name: Bundle the X11 and EGL libraries Qt needs to open a window
+        # These aren't present on every system (e.g. minimal installs and the
+        # AppImage catalog's test machine), so ship them inside the AppImage.
         run: |
-          cp -L /usr/lib/x86_64-linux-gnu/libxcb-cursor.so.0 dist/Auris/_internal/
-          if [ -d dist/Auris/_internal/PySide6/Qt/lib ]; then
-            cp -L /usr/lib/x86_64-linux-gnu/libxcb-cursor.so.0 dist/Auris/_internal/PySide6/Qt/lib/
-          fi
+          LIBDIR=/usr/lib/x86_64-linux-gnu
+          QTLIB=dist/Auris/_internal/PySide6/Qt/lib
+          for lib in libxcb-cursor.so.0 libxkbcommon-x11.so.0 libxkbcommon.so.0 \
+                     libxcb-icccm.so.4 libxcb-util.so.1 libxcb-image.so.0 \
+                     libxcb-keysyms.so.1 libxcb-render-util.so.0 libxcb-shape.so.0 \
+                     libxcb-xkb.so.1 libEGL.so.1 libGLdispatch.so.0; do
+            if [ -e "$LIBDIR/$lib" ]; then
+              cp -L "$LIBDIR/$lib" dist/Auris/_internal/
+              [ -d "$QTLIB" ] && cp -L "$LIBDIR/$lib" "$QTLIB/"
+              echo "Bundled $lib"
+            else
+              echo "WARNING: $lib not found on build machine"
+            fi
+          done
 
       - name: Assemble AppDir
         run: |
@@ -104,7 +119,7 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: true
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: Auris-x86_64.AppImage
 
