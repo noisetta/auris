@@ -2,8 +2,7 @@
 
 If Auris is useful to you, consider supporting development:
 
-[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/noisetta)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/noisetta?style=flat&logo=githubsponsors&color=EA4AAA)](https://github.com/sponsors/noisetta)
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/noisetta) [![GitHub Sponsors](https://img.shields.io/github/sponsors/noisetta?style=flat&logo=githubsponsors&color=EA4AAA)](https://github.com/sponsors/noisetta)
 
 ---
 
@@ -94,17 +93,15 @@ Click **Compare Files** in the toolbar to open the comparison dialog.
 
 ## Requirements
 
-- Linux
+- Linux (x86_64). The AppImage runs on Ubuntu 22.04 or newer, Debian 12, Linux Mint 21, Pop!_OS 22.04, Fedora, Arch and other current distributions
 - FFmpeg (with ebur128 support — included in standard builds)
-- libfuse2 (only needed for AppImage)
-- libxcb-cursor0 (only needed for AppImage)
 - Python 3.12+ (only needed if running from source)
 
 ---
 
 ## Installation (AppImage — recommended)
 
-1. Download `Auris-x86_64.AppImage` from the [latest release](https://github.com/noisetta/auris/releases)
+1. Download `Auris-x86_64.AppImage` from the [latest release](https://github.com/noisetta/auris/releases/latest)
 2. Make it executable and run:
 
 ```bash
@@ -112,11 +109,22 @@ chmod +x Auris-x86_64.AppImage
 ./Auris-x86_64.AppImage
 ```
 
-Install dependencies if needed (Ubuntu / Debian / Pop!_OS):
+If FFmpeg isn't installed yet:
 
 ```bash
-sudo apt install ffmpeg libfuse2 libxcb-cursor0
+# Ubuntu / Debian / Mint / Pop!_OS
+sudo apt install ffmpeg
+
+# Fedora (FFmpeg is provided via RPM Fusion)
+sudo dnf install ffmpeg
+
+# Arch / Manjaro / CachyOS
+sudo pacman -S ffmpeg
 ```
+
+Everything else Auris needs is bundled inside the AppImage.
+
+---
 
 ## Installation (from source)
 
@@ -140,13 +148,23 @@ python app.py
 
 ## Changelog
 
+### v1.1.2
+
+- **Wider compatibility** — the AppImage is now built automatically on Ubuntu 22.04, so it runs on older distributions that previously couldn't start it (glibc errors)
+- **Fewer dependencies** — the AppImage no longer needs `libfuse2` or `libxcb-cursor0` installed on your system
+- **Fixed scans failing** — every file could show `scan_failed` on some systems because FFmpeg was picking up libraries bundled inside the AppImage
+- **Fixed Open File / Reveal in Folder and dark mode detection** in the AppImage, for the same reason
+- **Removed Fontconfig warnings** printed to the terminal on some systems
+
 ### v1.1.1
+
 - **WMA support** — `.wma` files now supported in both the scanner and Compare Files dialog
 - **Bug fixes** — duplicate widgets in action row, double error dialog on scan failure, help dialog referencing old quality label, app icon not loading inside AppImage
 - **Version label** — current version now visible in the UI
 - **Typo fix** — corrected "EMMS" label in Compare Files dialog
 
 ### v1.1.0
+
 - **Compare Files** — new feature to compare 2–5 audio files side by side with quality recommendation
 - **Spectral classification renamed** — labels now describe measured frequency content (Full Spectrum / Reduced Spectrum / Limited Spectrum) rather than making provenance claims (Lossless / Likely Lossy / Lossy)
 - **Spectral Gap column** — shows actual measured dB gap so users can evaluate results directly
@@ -157,14 +175,17 @@ python app.py
 - **Help text and tooltips updated** — more accurate explanations of what each metric measures and its limitations
 
 ### v1.0.2
+
 - Updated quality labels to Lossless / Likely Lossy / Lossy for clarity
 - Added disclaimer in help dialog about spectral analysis limitations
 - Added support for .m4a, .aac, .ogg, and .opus audio formats
 
 ### v1.0.1
+
 - Column header display fix
 
 ### v1.0.0
+
 - Initial release
 
 ---
@@ -188,4 +209,4 @@ Contributions are welcome. Feel free to open issues or pull requests on GitHub.
 
 ## License
 
-MIT License — free to use, modify, and distribute.
+MIT License — free to use, modify, and distribute. See [LICENSE](LICENSE) for the full text.
