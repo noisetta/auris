@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -38,6 +38,11 @@ jobs:
           pyinstaller --noconfirm --windowed --name Auris \
             --add-data "auris.png:." \
             app.py
+
+      - name: Remove font libraries (use the system's copies instead)
+        run: |
+          find dist/Auris/_internal -name 'libfontconfig.so*' -delete
+          find dist/Auris/_internal -name 'libfreetype.so*' -delete
 
       - name: Bundle libxcb-cursor (so users don't need to install it)
         run: |
@@ -80,7 +85,7 @@ jobs:
           APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 ./appimagetool-x86_64.AppImage AppDir Auris-x86_64.AppImage
 
       - name: Keep a copy as a workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Auris-x86_64.AppImage
           path: Auris-x86_64.AppImage
