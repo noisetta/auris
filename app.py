@@ -149,7 +149,7 @@ class MainWindow(QMainWindow):
         filter_row.addWidget(self.filter_low)
         filter_row.addWidget(self.filter_failed)
 
-        self.version_label = QLabel("v1.1.2")
+        self.version_label = QLabel("v1.1.3")
         self.version_label.setStyleSheet("color: gray; font-size: 11px;")
         self.version_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
